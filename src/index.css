@@ -1,42 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Wedding Theme Design System - Rochinel & Chanelle
+Theme: Blanc, Bleu, Or - Elegant Wedding Platform
 */
 
 @layer base {
   :root {
+    /* Wedding Color Palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Wedding Blue - Deep Royal Blue */
+    --primary: 220 85% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 220 70% 75%;
+    --primary-dark: 220 95% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Wedding Gold - Elegant Golden */
+    --secondary: 45 90% 65%;
+    --secondary-foreground: 220 15% 15%;
+    --secondary-light: 45 85% 80%;
+    --secondary-dark: 45 95% 50%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Soft Wedding Tones */
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 25% 95%;
+    --accent-foreground: 220 15% 15%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 20% 90%;
+    --input: 220 20% 95%;
+    --ring: 220 85% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Wedding Gradients */
+    --gradient-wedding: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    --gradient-elegant: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 25% 98%) 100%);
+    --gradient-golden: linear-gradient(135deg, hsl(var(--secondary-light)) 0%, hsl(var(--secondary)) 50%, hsl(var(--secondary-dark)) 100%);
+    --gradient-blue: linear-gradient(135deg, hsl(var(--primary-light)) 0%, hsl(var(--primary)) 50%, hsl(var(--primary-dark)) 100%);
+
+    /* Wedding Shadows */
+    --shadow-wedding: 0 10px 40px -10px hsl(var(--primary) / 0.3);
+    --shadow-golden: 0 8px 30px -8px hsl(var(--secondary) / 0.4);
+    --shadow-elegant: 0 20px 60px -15px hsl(220 15% 15% / 0.1);
+
+    /* Animations */
+    --transition-elegant: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s ease-in-out;
 
     --sidebar-background: 0 0% 98%;
 
