@@ -51,11 +51,11 @@ const WeddingDetails = () => {
   return (
     <section className="py-20 px-6 bg-gradient-to-b from-background to-accent/30">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 opacity-0 animate-fade-in">
           <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Programme du Mariage
           </h2>
-          <p className="font-inter text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="font-cormorant text-xl text-muted-foreground max-w-2xl mx-auto italic">
             Découvrez le déroulement de cette journée exceptionnelle que nous avons préparée pour vous
           </p>
         </div>
@@ -66,7 +66,8 @@ const WeddingDetails = () => {
             return (
               <Card 
                 key={index} 
-                className="group hover:shadow-wedding transition-all duration-500 transform hover:-translate-y-2 border-border/50 bg-card/80 backdrop-blur-sm"
+                className="group hover:shadow-wedding transition-all duration-500 transform hover:-translate-y-2 border-border/50 bg-card/80 backdrop-blur-sm opacity-0 animate-scale-in"
+                style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <CardContent className="p-8">
                   <div className="flex items-center gap-4 mb-6">

@@ -39,18 +39,18 @@ const RSVPSection = () => {
   return (
     <section className="py-20 px-6 bg-gradient-to-br from-accent/20 via-background to-accent/30">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <Heart className="w-16 h-16 mx-auto mb-6 text-secondary animate-pulse" />
+        <div className="text-center mb-12 opacity-0 animate-fade-in">
+          <Heart className="w-16 h-16 mx-auto mb-6 text-secondary animate-romantic-pulse" />
           <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Confirmez votre présence
           </h2>
-          <p className="font-inter text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="font-cormorant text-xl text-muted-foreground max-w-2xl mx-auto italic">
             Nous serions ravis de vous compter parmi nous pour ce jour si spécial. 
             Merci de confirmer votre présence avant le <strong>5 août</strong>.
           </p>
         </div>
 
-        <Card className="border-2 border-primary/20 shadow-elegant bg-card/80 backdrop-blur-sm">
+        <Card className="border-2 border-primary/20 shadow-elegant bg-card/80 backdrop-blur-sm opacity-0 animate-delayed-fade-in">
           <CardHeader className="text-center pb-6">
             <CardTitle className="font-playfair text-3xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Formulaire RSVP

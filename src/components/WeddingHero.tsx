@@ -20,31 +20,31 @@ const WeddingHero = () => {
         <div className="mb-8 animate-fade-in">
           <Heart className="w-16 h-16 mx-auto mb-6 text-secondary animate-pulse" />
           <h1 className="font-playfair text-6xl md:text-8xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-text-shimmer bg-[length:200%_100%] opacity-0 animate-fade-in">
               Rochinel
             </span>
-            <span className="block font-inter text-2xl md:text-3xl font-light text-muted-foreground my-4">
+            <span className="block font-dancing text-3xl md:text-4xl font-medium text-secondary my-6 opacity-0 animate-delayed-fade-in">
               &
             </span>
-            <span className="bg-gradient-to-r from-secondary via-primary to-secondary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-secondary via-primary to-secondary bg-clip-text text-transparent animate-text-shimmer bg-[length:200%_100%] opacity-0 animate-delayed-fade-in-2">
               Chanelle
             </span>
           </h1>
-          <p className="font-inter text-xl md:text-2xl text-foreground/80 mb-8">
-            Nous unissons nos cœurs ce samedi
+          <p className="font-cormorant text-xl md:text-2xl text-foreground/80 mb-8 opacity-0 animate-delayed-fade-in-3 italic">
+            Nous unissons nos cœurs ce samedi dans une célébration d'amour éternel
           </p>
         </div>
 
         {/* Wedding Details */}
-        <div className="bg-card/80 backdrop-blur-lg rounded-2xl p-8 mb-8 border border-border/50 shadow-elegant">
+        <div className="bg-card/90 backdrop-blur-xl rounded-3xl p-8 mb-8 border border-border/50 shadow-elegant opacity-0 animate-scale-in hover:shadow-2xl transition-all duration-500">
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-6">
-            <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6 text-primary" />
+            <div className="flex items-center gap-3 group">
+              <Calendar className="w-6 h-6 text-primary group-hover:animate-romantic-pulse" />
               <span className="font-inter font-medium text-lg">Samedi 9 Août 2025</span>
             </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="w-6 h-6 text-secondary" />
-              <span className="font-inter font-medium text-lg">Cérémonie à venir</span>
+            <div className="flex items-center gap-3 group">
+              <MapPin className="w-6 h-6 text-secondary group-hover:animate-float" />
+              <span className="font-inter font-medium text-lg">Lieu à confirmer</span>
             </div>
           </div>
           
@@ -65,9 +65,17 @@ const WeddingHero = () => {
           </div>
         </div>
 
-        <p className="font-playfair text-lg text-foreground/70 italic">
-          "L'amour ne consiste pas à se regarder l'un l'autre, mais à regarder ensemble dans la même direction"
-        </p>
+        <div className="opacity-0 animate-delayed-fade-in-3">
+          <p className="font-dancing text-2xl text-foreground/70 mb-2">
+            "L'amour ne consiste pas à se regarder l'un l'autre,"
+          </p>
+          <p className="font-dancing text-2xl text-foreground/70">
+            "mais à regarder ensemble dans la même direction"
+          </p>
+          <p className="font-cormorant text-lg text-muted-foreground mt-4 italic">
+            - Antoine de Saint-Exupéry
+          </p>
+        </div>
       </div>
 
       {/* Decorative Elements */}
