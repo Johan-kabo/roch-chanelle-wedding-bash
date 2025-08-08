@@ -53,6 +53,10 @@ const WeddingHero = () => {
           <div className="flex flex-col gap-3 sm:gap-4 justify-center">
             <Button 
               size="lg" 
+              onClick={() => {
+                const rsvpSection = document.getElementById('rsvp-section');
+                rsvpSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-primary-foreground font-medium px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 shadow-wedding w-full sm:w-auto"
             >
               Confirmer ma présence
@@ -60,6 +64,10 @@ const WeddingHero = () => {
             <Button 
               variant="outline" 
               size="lg"
+              onClick={() => {
+                const detailsSection = document.getElementById('wedding-details');
+                detailsSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-medium px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
             >
               Voir les détails

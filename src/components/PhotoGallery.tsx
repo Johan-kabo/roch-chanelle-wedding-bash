@@ -17,7 +17,7 @@ const PhotoGallery = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-muted/20 via-background to-muted/20">
+    <section id="photo-gallery" className="py-20 px-6 bg-gradient-to-br from-muted/20 via-background to-muted/20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 opacity-0 animate-fade-in">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -61,6 +61,13 @@ const PhotoGallery = () => {
         <div className="text-center opacity-0 animate-delayed-fade-in-2">
           <Button 
             size="lg"
+            onClick={() => {
+              // Simulation du téléchargement
+              const link = document.createElement('a');
+              link.href = '/lovable-uploads/6533e4fc-2225-4404-bc07-ad683c87a1e0.png';
+              link.download = 'photos-rochinel-chanelle.zip';
+              link.click();
+            }}
             className="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-medium px-8 py-6 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             <Download className="w-5 h-5 mr-2" />

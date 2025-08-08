@@ -47,7 +47,7 @@ const Timeline = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background">
+    <section id="timeline-section" className="py-20 px-6 bg-gradient-to-br from-background via-muted/30 to-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16 opacity-0 animate-fade-in">
           <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">

@@ -37,7 +37,7 @@ const RSVPSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-accent/20 via-background to-accent/30">
+    <section id="rsvp-section" className="py-20 px-6 bg-gradient-to-br from-accent/20 via-background to-accent/30">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 opacity-0 animate-fade-in">
           <Heart className="w-16 h-16 mx-auto mb-6 text-secondary animate-romantic-pulse" />

@@ -49,7 +49,7 @@ const WeddingDetails = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-b from-background to-accent/30">
+    <section id="wedding-details" className="py-20 px-6 bg-gradient-to-b from-background to-accent/30">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 opacity-0 animate-fade-in">
           <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
