@@ -6,14 +6,14 @@ import { Camera, Heart, Download } from "lucide-react";
 const PhotoGallery = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
-  // Placeholder for couple photos
+  // Real couple photos
   const photos = [
-    { id: 1, url: "/placeholder.svg", caption: "Notre première rencontre" },
-    { id: 2, url: "/placeholder.svg", caption: "Demande en mariage" },
-    { id: 3, url: "/placeholder.svg", caption: "Nos fiançailles" },
+    { id: 1, url: "/lovable-uploads/6533e4fc-2225-4404-bc07-ad683c87a1e0.png", caption: "Notre amour en tenue traditionnelle" },
+    { id: 2, url: "/lovable-uploads/c35b8b46-bb30-4bbf-b895-8ec19ccfe22a.png", caption: "Moments de bonheur ensemble" },
+    { id: 3, url: "/lovable-uploads/2d10cada-c446-4258-bde7-309b2957ccbc.png", caption: "Notre joie partagée" },
     { id: 4, url: "/placeholder.svg", caption: "Préparatifs du mariage" },
     { id: 5, url: "/placeholder.svg", caption: "Séance engagement" },
-    { id: 6, url: "/placeholder.svg", caption: "Notre amour" }
+    { id: 6, url: "/placeholder.svg", caption: "Nos fiançailles" }
   ];
 
   return (
