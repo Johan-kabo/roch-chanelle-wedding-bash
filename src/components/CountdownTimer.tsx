@@ -48,21 +48,21 @@ const CountdownTimer = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-8">
           {timeUnits.map((unit, index) => (
             <Card 
               key={unit.label}
-              className={`p-6 text-center bg-card/80 backdrop-blur-sm border-2 ${
+              className={`p-3 sm:p-4 md:p-6 text-center bg-card/80 backdrop-blur-sm border-2 ${
                 unit.color === 'primary' ? 'border-primary/30' : 'border-secondary/30'
               } hover:shadow-lg transition-all duration-300 transform hover:scale-105 opacity-0 animate-scale-in`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className={`text-3xl md:text-4xl font-bold font-playfair mb-2 ${
+              <div className={`text-2xl sm:text-3xl md:text-4xl font-bold font-playfair mb-1 sm:mb-2 ${
                 unit.color === 'primary' ? 'text-primary' : 'text-secondary'
               }`}>
                 {unit.value.toString().padStart(2, '0')}
               </div>
-              <div className="text-sm md:text-base font-inter text-muted-foreground uppercase tracking-wider">
+              <div className="text-xs sm:text-sm md:text-base font-inter text-muted-foreground uppercase tracking-wider">
                 {unit.label}
               </div>
             </Card>

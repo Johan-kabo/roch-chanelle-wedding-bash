@@ -60,7 +60,7 @@ const WeddingDetails = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
           {details.map((section, index) => {
             const Icon = section.icon;
             return (
@@ -69,24 +69,24 @@ const WeddingDetails = () => {
                 className="group hover:shadow-wedding transition-all duration-500 transform hover:-translate-y-2 border-border/50 bg-card/80 backdrop-blur-sm opacity-0 animate-scale-in"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 group-hover:from-primary/20 group-hover:to-secondary/20 transition-all duration-300">
-                      <Icon className="w-8 h-8 text-primary group-hover:text-secondary transition-colors duration-300" />
+                <CardContent className="p-4 sm:p-6 md:p-8">
+                  <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                    <div className="p-2 md:p-3 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 group-hover:from-primary/20 group-hover:to-secondary/20 transition-all duration-300">
+                      <Icon className="w-6 h-6 md:w-8 md:h-8 text-primary group-hover:text-secondary transition-colors duration-300" />
                     </div>
-                    <h3 className="font-playfair text-2xl font-semibold text-foreground">
+                    <h3 className="font-playfair text-lg sm:text-xl md:text-2xl font-semibold text-foreground">
                       {section.title}
                     </h3>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2 md:space-y-3">
                     {section.items.map((item, itemIndex) => (
                       <div 
                         key={itemIndex}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors duration-200"
+                        className="flex items-start gap-2 md:gap-3 p-2 md:p-3 rounded-lg hover:bg-accent/50 transition-colors duration-200"
                       >
-                        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary mt-2 flex-shrink-0" />
-                        <span className="font-inter text-foreground/80 leading-relaxed">
+                        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-secondary mt-1.5 md:mt-2 flex-shrink-0" />
+                        <span className="font-inter text-sm md:text-base text-foreground/80 leading-relaxed">
                           {item}
                         </span>
                       </div>
@@ -99,14 +99,14 @@ const WeddingDetails = () => {
         </div>
 
         {/* Special Information Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-8 md:mt-12">
           <Card className="border-2 border-secondary/30 bg-gradient-to-br from-secondary/5 to-primary/5">
-            <CardContent className="p-8 text-center">
-              <Gift className="w-12 h-12 mx-auto mb-4 text-secondary" />
-              <h3 className="font-playfair text-2xl font-semibold mb-4 text-foreground">
+            <CardContent className="p-4 sm:p-6 md:p-8 text-center">
+              <Gift className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-3 md:mb-4 text-secondary" />
+              <h3 className="font-playfair text-lg sm:text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-foreground">
                 Liste de Mariage
               </h3>
-              <p className="font-inter text-muted-foreground leading-relaxed">
+              <p className="font-inter text-sm md:text-base text-muted-foreground leading-relaxed">
                 Votre présence est le plus beau des cadeaux. Si vous souhaitez nous gâter, 
                 une liste de mariage est disponible ou une participation pour notre voyage de noces.
               </p>
@@ -114,12 +114,12 @@ const WeddingDetails = () => {
           </Card>
 
           <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardContent className="p-8 text-center">
-              <Camera className="w-12 h-12 mx-auto mb-4 text-primary" />
-              <h3 className="font-playfair text-2xl font-semibold mb-4 text-foreground">
+            <CardContent className="p-4 sm:p-6 md:p-8 text-center">
+              <Camera className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-3 md:mb-4 text-primary" />
+              <h3 className="font-playfair text-lg sm:text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-foreground">
                 Partagez vos photos
               </h3>
-              <p className="font-inter text-muted-foreground leading-relaxed">
+              <p className="font-inter text-sm md:text-base text-muted-foreground leading-relaxed">
                 Immortalisez ces moments précieux et partagez vos plus belles photos 
                 avec nous via notre album photo collaboratif en ligne.
               </p>

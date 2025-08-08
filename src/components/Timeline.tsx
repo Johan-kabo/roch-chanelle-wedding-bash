@@ -60,7 +60,8 @@ const Timeline = () => {
 
         <div className="relative">
           {/* Timeline Line */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary via-secondary to-primary rounded-full opacity-30"></div>
+          {/* Timeline Line - Hidden on mobile */}
+          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary via-secondary to-primary rounded-full opacity-30"></div>
           
           {timelineEvents.map((event, index) => {
             const Icon = event.icon;
@@ -69,13 +70,31 @@ const Timeline = () => {
             return (
               <div 
                 key={index} 
-                className={`relative flex items-center mb-12 opacity-0 ${
-                  isEven ? 'animate-slide-in-left' : 'animate-slide-in-right'
-                }`}
+                className={`relative flex items-center mb-8 md:mb-12 opacity-0 animate-fade-in`}
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
-                {/* Content */}
-                <div className={`w-5/12 ${isEven ? 'text-right pr-8' : 'text-left pl-8 ml-auto'}`}>
+                {/* Mobile Layout */}
+                <div className="md:hidden w-full">
+                  <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="font-inter font-semibold text-lg text-primary">
+                        {event.time}
+                      </span>
+                    </div>
+                    <h3 className="font-playfair text-xl font-semibold mb-2 text-foreground">
+                      {event.title}
+                    </h3>
+                    <p className="font-inter text-muted-foreground text-sm">
+                      {event.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className={`hidden md:block w-5/12 ${isEven ? 'text-right pr-8' : 'text-left pl-8 ml-auto'}`}>
                   <div className={`bg-card/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border/50 hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
                     isEven ? 'mr-auto' : 'ml-auto'
                   }`}>
@@ -94,8 +113,8 @@ const Timeline = () => {
                   </div>
                 </div>
 
-                {/* Timeline Icon */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-lg animate-romantic-pulse">
+                {/* Timeline Icon - Desktop only */}
+                <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full items-center justify-center shadow-lg animate-romantic-pulse">
                   <Icon className="w-8 h-8 text-white" />
                 </div>
               </div>
