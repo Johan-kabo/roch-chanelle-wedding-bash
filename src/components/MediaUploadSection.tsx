@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,23 +6,53 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Upload, Image, Video, Download, Trash2, Camera, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface MediaFile {
-  id: string;
-  name: string;
-  url: string;
-  type: 'image' | 'video';
-  uploadedBy?: string;
-  uploadedAt: Date;
-}
+import { supabase, type MediaFile } from "@/lib/supabase";
 
 const MediaUploadSection = () => {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploaderName, setUploaderName] = useState("");
+  const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Charger les fichiers existants au démarrage
+  useEffect(() => {
+    loadMediaFiles();
+  }, []);
+
+  const loadMediaFiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('media_files')
+        .select('*')
+        .order('uploaded_at', { ascending: false });
+
+      if (error) {
+        console.error('Erreur lors du chargement:', error);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les fichiers existants.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setMediaFiles(data || []);
+    } catch (error) {
+      console.error('Erreur:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFileUrl = (filePath: string) => {
+    const { data } = supabase.storage
+      .from('wedding-media')
+      .getPublicUrl(filePath);
+    return data.publicUrl;
+  };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -41,20 +71,57 @@ const MediaUploadSection = () => {
 
     try {
       for (const file of files) {
-        // Simulate file upload - In real implementation, this would upload to Supabase Storage
-        const fileUrl = URL.createObjectURL(file);
         const fileType = file.type.startsWith('image/') ? 'image' : 'video';
-        
-        const newFile: MediaFile = {
-          id: Math.random().toString(36).substring(7),
-          name: file.name,
-          url: fileUrl,
-          type: fileType,
-          uploadedBy: uploaderName,
-          uploadedAt: new Date()
-        };
+        const fileName = `${Date.now()}-${file.name}`;
+        const filePath = `${fileType}s/${fileName}`;
 
-        setMediaFiles(prev => [...prev, newFile]);
+        // Upload vers Supabase Storage
+        const { error: uploadError } = await supabase.storage
+          .from('wedding-media')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Erreur upload storage:', uploadError);
+          toast({
+            title: "Erreur d'upload",
+            description: `Erreur lors de l'upload de ${file.name}`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Sauvegarder les métadonnées en base
+        const { data: newFile, error: dbError } = await supabase
+          .from('media_files')
+          .insert({
+            name: file.name,
+            file_path: filePath,
+            file_type: fileType,
+            uploaded_by: uploaderName,
+            file_size: file.size
+          })
+          .select()
+          .single();
+
+        if (dbError) {
+          console.error('Erreur base de données:', dbError);
+          // Nettoyer le fichier uploadé en cas d'erreur DB
+          await supabase.storage
+            .from('wedding-media')
+            .remove([filePath]);
+          
+          toast({
+            title: "Erreur de sauvegarde",
+            description: `Erreur lors de la sauvegarde de ${file.name}`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Ajouter le nouveau fichier à la liste
+        if (newFile) {
+          setMediaFiles(prev => [newFile, ...prev]);
+        }
       }
 
       toast({
@@ -67,6 +134,7 @@ const MediaUploadSection = () => {
         fileInputRef.current.value = '';
       }
     } catch (error) {
+      console.error('Erreur générale:', error);
       toast({
         title: "Erreur d'upload",
         description: "Une erreur est survenue lors de l'upload.",
@@ -78,10 +146,11 @@ const MediaUploadSection = () => {
   };
 
   const handleDownload = (file: MediaFile) => {
-    // In real implementation, this would download from Supabase Storage
+    const fileUrl = getFileUrl(file.file_path);
     const link = document.createElement('a');
-    link.href = file.url;
+    link.href = fileUrl;
     link.download = file.name;
+    link.target = '_blank';
     link.click();
     
     toast({
@@ -90,13 +159,64 @@ const MediaUploadSection = () => {
     });
   };
 
-  const handleDelete = (fileId: string) => {
-    setMediaFiles(prev => prev.filter(file => file.id !== fileId));
-    toast({
-      title: "Fichier supprimé",
-      description: "Le fichier a été supprimé avec succès.",
-    });
+  const handleDelete = async (file: MediaFile) => {
+    try {
+      // Supprimer de Supabase Storage
+      const { error: storageError } = await supabase.storage
+        .from('wedding-media')
+        .remove([file.file_path]);
+
+      if (storageError) {
+        console.error('Erreur suppression storage:', storageError);
+      }
+
+      // Supprimer de la base de données
+      const { error: dbError } = await supabase
+        .from('media_files')
+        .delete()
+        .eq('id', file.id);
+
+      if (dbError) {
+        console.error('Erreur suppression DB:', dbError);
+        toast({
+          title: "Erreur de suppression",
+          description: "Impossible de supprimer le fichier.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Retirer de la liste locale
+      setMediaFiles(prev => prev.filter(f => f.id !== file.id));
+      
+      toast({
+        title: "Fichier supprimé",
+        description: "Le fichier a été supprimé avec succès.",
+      });
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la suppression.",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <section id="photo-gallery" className="py-20 px-6 bg-gradient-to-br from-muted/20 via-background to-muted/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center">
+            <Camera className="w-16 h-16 mx-auto mb-4 text-muted-foreground animate-pulse" />
+            <p className="text-muted-foreground text-lg">
+              Chargement des souvenirs...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="photo-gallery" className="py-20 px-6 bg-gradient-to-br from-muted/20 via-background to-muted/20">
@@ -173,9 +293,9 @@ const MediaUploadSection = () => {
                   className="relative aspect-square overflow-hidden cursor-pointer"
                   onClick={() => setSelectedMedia(file)}
                 >
-                  {file.type === 'image' ? (
+                  {file.file_type === 'image' ? (
                     <img 
-                      src={file.url} 
+                      src={getFileUrl(file.file_path)} 
                       alt={file.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -189,14 +309,17 @@ const MediaUploadSection = () => {
                   
                   <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <p className="font-dancing text-sm font-medium truncate">{file.name}</p>
-                    <p className="text-xs text-white/80">Par: {file.uploadedBy}</p>
+                    <p className="text-xs text-white/80">Par: {file.uploaded_by}</p>
                   </div>
 
                   <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Button
                       size="icon"
                       variant="secondary"
-                      onClick={() => handleDownload(file)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(file);
+                      }}
                       className="h-8 w-8 bg-white/20 hover:bg-white/30"
                     >
                       <Download className="w-4 h-4" />
@@ -204,7 +327,10 @@ const MediaUploadSection = () => {
                     <Button
                       size="icon"
                       variant="destructive"
-                      onClick={() => handleDelete(file.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(file);
+                      }}
                       className="h-8 w-8 bg-red-500/20 hover:bg-red-500/30"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -212,7 +338,7 @@ const MediaUploadSection = () => {
                   </div>
 
                   <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {file.type === 'image' ? (
+                    {file.file_type === 'image' ? (
                       <Image className="w-6 h-6 text-white" />
                     ) : (
                       <Video className="w-6 h-6 text-white" />
@@ -251,45 +377,47 @@ const MediaUploadSection = () => {
               </Button>
 
               {selectedMedia && (
-                <div className="w-full h-full flex flex-col">
-                  <div className="flex-1 flex items-center justify-center p-4">
-                    {selectedMedia.type === 'image' ? (
-                      <img 
-                        src={selectedMedia.url} 
-                        alt={selectedMedia.name}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <video 
-                        src={selectedMedia.url}
-                        controls
-                        className="max-w-full max-h-full"
-                        autoPlay
-                      />
-                    )}
-                  </div>
-                  
-                  <div className="p-6 bg-black/50 text-white">
-                    <h3 className="font-playfair text-xl font-bold mb-2">{selectedMedia.name}</h3>
-                    <p className="text-white/80 mb-4">Partagé par: {selectedMedia.uploadedBy}</p>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => handleDownload(selectedMedia)}
-                        className="bg-primary hover:bg-primary/80"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Télécharger
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => {
-                          handleDelete(selectedMedia.id);
-                          setSelectedMedia(null);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Supprimer
-                      </Button>
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-full h-full flex flex-col">
+                    <div className="flex-1 flex items-center justify-center p-4">
+                      {selectedMedia.file_type === 'image' ? (
+                        <img 
+                          src={getFileUrl(selectedMedia.file_path)} 
+                          alt={selectedMedia.name}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      ) : (
+                        <video 
+                          src={getFileUrl(selectedMedia.file_path)}
+                          controls
+                          className="max-w-full max-h-full"
+                          autoPlay
+                        />
+                      )}
+                    </div>
+                    
+                    <div className="p-6 bg-black/50 text-white">
+                      <h3 className="font-playfair text-xl font-bold mb-2">{selectedMedia.name}</h3>
+                      <p className="text-white/80 mb-4">Partagé par: {selectedMedia.uploaded_by}</p>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleDownload(selectedMedia)}
+                          className="bg-primary hover:bg-primary/80"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Télécharger
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => {
+                            handleDelete(selectedMedia);
+                            setSelectedMedia(null);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Supprimer
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

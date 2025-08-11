@@ -13,3 +13,4 @@ export type MediaFile = {
   uploaded_by: string
   uploaded_at: string
   file_size: number
+}
