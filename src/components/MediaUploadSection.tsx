@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Image, Video, Download, Trash2, Camera } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Upload, Image, Video, Download, Trash2, Camera, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MediaFile {
@@ -19,6 +20,7 @@ const MediaUploadSection = () => {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploaderName, setUploaderName] = useState("");
+  const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -167,7 +169,10 @@ const MediaUploadSection = () => {
                 className="group overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500 opacity-0 animate-scale-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="relative aspect-square overflow-hidden">
+                <div 
+                  className="relative aspect-square overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedMedia(file)}
+                >
                   {file.type === 'image' ? (
                     <img 
                       src={file.url} 
@@ -227,6 +232,71 @@ const MediaUploadSection = () => {
             </p>
           </div>
         )}
+
+        {/* Media Viewer Modal */}
+        <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/95 border-0">
+            <DialogTitle className="sr-only">
+              {selectedMedia?.name}
+            </DialogTitle>
+            
+            <div className="relative w-full h-full flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedMedia(null)}
+                className="absolute top-4 right-4 z-10 text-white hover:bg-white/20 h-10 w-10"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+
+              {selectedMedia && (
+                <div className="w-full h-full flex flex-col">
+                  <div className="flex-1 flex items-center justify-center p-4">
+                    {selectedMedia.type === 'image' ? (
+                      <img 
+                        src={selectedMedia.url} 
+                        alt={selectedMedia.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    ) : (
+                      <video 
+                        src={selectedMedia.url}
+                        controls
+                        className="max-w-full max-h-full"
+                        autoPlay
+                      />
+                    )}
+                  </div>
+                  
+                  <div className="p-6 bg-black/50 text-white">
+                    <h3 className="font-playfair text-xl font-bold mb-2">{selectedMedia.name}</h3>
+                    <p className="text-white/80 mb-4">Partagé par: {selectedMedia.uploadedBy}</p>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleDownload(selectedMedia)}
+                        className="bg-primary hover:bg-primary/80"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Télécharger
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          handleDelete(selectedMedia.id);
+                          setSelectedMedia(null);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Supprimer
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );
