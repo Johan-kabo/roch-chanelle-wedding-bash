@@ -31,22 +31,24 @@ const WeddingHero = () => {
             </span>
           </h1>
           <p className="font-cormorant text-lg sm:text-xl md:text-2xl text-foreground/80 mb-6 md:mb-8 opacity-0 animate-delayed-fade-in-3 italic px-4">
-            Nous unissons nos cœurs ce samedi dans une célébration d'amour éternel
+            Merci d'avoir partagé notre bonheur - votre amour nous accompagnera pour toujours
           </p>
         </div>
 
         {/* Wedding Details */}
         <div className="bg-card/90 backdrop-blur-xl rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 border border-border/50 shadow-elegant opacity-0 animate-scale-in hover:shadow-2xl transition-all duration-500 mx-2">
           <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 mb-4 sm:mb-6">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
-              <div className="flex items-center gap-3 group">
+            <div className="text-center">
+              <p className="font-cormorant text-lg sm:text-xl md:text-2xl text-foreground/90 mb-2">
+                Notre mariage s'est déroulé le
+              </p>
+              <div className="flex items-center justify-center gap-3 group mb-4">
                 <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:animate-romantic-pulse" />
-                <span className="font-inter font-medium text-sm sm:text-base md:text-lg">Samedi 9 Août 2025</span>
+                <span className="font-inter font-bold text-base sm:text-lg md:text-xl">Samedi 9 Août 2025</span>
               </div>
-              <div className="flex items-center gap-3 group">
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-secondary group-hover:animate-float" />
-                <span className="font-inter font-medium text-sm sm:text-base md:text-lg">Lieu à confirmer</span>
-              </div>
+              <p className="font-cormorant text-base sm:text-lg text-muted-foreground italic">
+                Un jour magique rendu encore plus beau par votre présence
+              </p>
             </div>
           </div>
           
@@ -54,23 +56,23 @@ const WeddingHero = () => {
             <Button 
               size="lg" 
               onClick={() => {
-                const rsvpSection = document.getElementById('rsvp-section');
-                rsvpSection?.scrollIntoView({ behavior: 'smooth' });
+                const uploadSection = document.getElementById('photo-gallery');
+                uploadSection?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-primary-foreground font-medium px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 shadow-wedding w-full sm:w-auto"
             >
-              Confirmer ma présence
+              Partager vos photos
             </Button>
             <Button 
               variant="outline" 
               size="lg"
               onClick={() => {
-                const detailsSection = document.getElementById('wedding-details');
-                detailsSection?.scrollIntoView({ behavior: 'smooth' });
+                const thanksSection = document.getElementById('thanks-section');
+                thanksSection?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-medium px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
             >
-              Voir les détails
+              Lire nos remerciements
             </Button>
           </div>
         </div>
