@@ -322,15 +322,15 @@ const MediaUploadSection = () => {
 
         {/* Gallery Controls */}
         {mediaFiles.length > 0 && (
-          <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col lg:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-muted-foreground" />
+                <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Button
                   variant={filter === 'all' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleFilterChange('all')}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-3"
                 >
                   Tous ({mediaFiles.length})
                 </Button>
@@ -338,7 +338,7 @@ const MediaUploadSection = () => {
                   variant={filter === 'image' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleFilterChange('image')}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-3"
                 >
                   Photos ({mediaFiles.filter(f => f.file_type === 'image').length})
                 </Button>
@@ -346,7 +346,7 @@ const MediaUploadSection = () => {
                   variant={filter === 'video' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleFilterChange('video')}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-3"
                 >
                   Vidéos ({mediaFiles.filter(f => f.file_type === 'video').length})
                 </Button>
@@ -358,16 +358,19 @@ const MediaUploadSection = () => {
                 variant={viewMode === 'masonry' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('masonry')}
+                className="text-xs sm:text-sm px-2 sm:px-3"
               >
-                <Grid className="w-4 h-4 mr-2" />
-                Mosaïque
+                <Grid className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Mosaïque</span>
+                <span className="sm:hidden">Mosa.</span>
               </Button>
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
+                className="text-xs sm:text-sm px-2 sm:px-3"
               >
-                <Grid className="w-4 h-4 mr-2" />
+                <Grid className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Grille
               </Button>
             </div>
@@ -379,20 +382,22 @@ const MediaUploadSection = () => {
           <>
             <div className={`${
               viewMode === 'masonry' 
-                ? 'columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6' 
-                : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                ? 'columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 sm:gap-6' 
+                : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6'
             }`}>
               {displayedFiles.map((file, index) => (
                 <Card 
                   key={file.id}
                   className={`group overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500 opacity-0 animate-scale-in ${
-                    viewMode === 'masonry' ? 'break-inside-avoid mb-6' : ''
+                    viewMode === 'masonry' ? 'break-inside-avoid mb-3 sm:mb-4 md:mb-6' : 'w-full'
                   }`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div 
                     className={`relative overflow-hidden cursor-pointer ${
-                      viewMode === 'masonry' ? 'aspect-auto' : 'aspect-square'
+                      viewMode === 'masonry' 
+                        ? 'aspect-auto' 
+                        : 'aspect-square w-full'
                     }`}
                     onClick={() => setSelectedMedia(file)}
                   >
@@ -401,57 +406,61 @@ const MediaUploadSection = () => {
                         src={getFileUrl(file.file_path)} 
                         alt={file.name}
                         className={`w-full object-cover transition-transform duration-500 group-hover:scale-110 ${
-                          viewMode === 'masonry' ? 'h-auto' : 'h-full'
+                          viewMode === 'masonry' 
+                            ? 'h-auto' 
+                            : 'h-full aspect-square object-cover'
                         }`}
                         loading="lazy"
                       />
                     ) : (
                       <div className={`w-full bg-muted flex items-center justify-center ${
-                        viewMode === 'masonry' ? 'aspect-video' : 'h-full'
+                        viewMode === 'masonry' 
+                          ? 'aspect-video min-h-[120px] sm:min-h-[150px] md:min-h-[200px]' 
+                          : 'h-full aspect-square'
                       }`}>
-                        <Video className="w-16 h-16 text-muted-foreground" />
+                        <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-muted-foreground" />
                       </div>
                     )}
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  <div className="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p className="font-dancing text-sm font-medium truncate">{file.name}</p>
-                    <p className="text-xs text-white/80">Par: {file.uploaded_by}</p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <p className="font-dancing text-xs sm:text-sm font-medium truncate">{file.name}</p>
+                      <p className="text-xs text-white/80">Par: {file.uploaded_by}</p>
+                    </div>
+
+                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownload(file);
+                        }}
+                        className="h-6 w-6 sm:h-8 sm:w-8 bg-white/20 hover:bg-white/30"
+                      >
+                        <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(file);
+                        }}
+                        className="h-6 w-6 sm:h-8 sm:w-8 bg-red-500/20 hover:bg-red-500/30"
+                      >
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </Button>
                   </div>
 
-                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(file);
-                      }}
-                      className="h-8 w-8 bg-white/20 hover:bg-white/30"
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(file);
-                      }}
-                      className="h-8 w-8 bg-red-500/20 hover:bg-red-500/30"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {file.file_type === 'image' ? (
-                      <Image className="w-6 h-6 text-white" />
-                    ) : (
-                      <Video className="w-6 h-6 text-white" />
-                    )}
-                  </div>
+                    <div className="absolute top-2 sm:top-4 left-2 sm:left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {file.file_type === 'image' ? (
+                        <Image className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                      ) : (
+                        <Video className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                      )}
+                    </div>
                   </div>
                 </Card>
               ))}
