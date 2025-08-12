@@ -4,16 +4,22 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Upload, Image, Video, Download, Trash2, Camera, X } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Upload, Image, Video, Download, Trash2, Camera, X, Grid, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase, type MediaFile } from "@/lib/supabase";
 
 const MediaUploadSection = () => {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [displayedFiles, setDisplayedFiles] = useState<MediaFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploaderName, setUploaderName] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+  const [filter, setFilter] = useState<'all' | 'image' | 'video'>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('masonry');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -40,12 +46,42 @@ const MediaUploadSection = () => {
       }
 
       setMediaFiles(data || []);
+      filterAndPaginateFiles(data || [], filter, 1);
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const filterAndPaginateFiles = (files: MediaFile[], filterType: 'all' | 'image' | 'video', page: number) => {
+    let filtered = files;
+    if (filterType !== 'all') {
+      filtered = files.filter(file => file.file_type === filterType);
+    }
+    
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setDisplayedFiles(filtered.slice(startIndex, endIndex));
+  };
+
+  const handleFilterChange = (newFilter: 'all' | 'image' | 'video') => {
+    setFilter(newFilter);
+    setCurrentPage(1);
+    filterAndPaginateFiles(mediaFiles, newFilter, 1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    filterAndPaginateFiles(mediaFiles, filter, page);
+  };
+
+  const getFilteredFiles = () => {
+    return filter === 'all' ? mediaFiles : mediaFiles.filter(file => file.file_type === filter);
+  };
+
+  const totalPages = Math.ceil(getFilteredFiles().length / itemsPerPage);
+  const totalFiles = getFilteredFiles().length;
 
   const getFileUrl = (filePath: string) => {
     const { data } = supabase.storage
@@ -120,7 +156,9 @@ const MediaUploadSection = () => {
 
         // Ajouter le nouveau fichier à la liste
         if (newFile) {
-          setMediaFiles(prev => [newFile, ...prev]);
+          const updatedFiles = [newFile, ...mediaFiles];
+          setMediaFiles(updatedFiles);
+          filterAndPaginateFiles(updatedFiles, filter, currentPage);
         }
       }
 
@@ -187,7 +225,9 @@ const MediaUploadSection = () => {
       }
 
       // Retirer de la liste locale
-      setMediaFiles(prev => prev.filter(f => f.id !== file.id));
+      const updatedFiles = mediaFiles.filter(f => f.id !== file.id);
+      setMediaFiles(updatedFiles);
+      filterAndPaginateFiles(updatedFiles, filter, currentPage);
       
       toast({
         title: "Fichier supprimé",
@@ -280,30 +320,98 @@ const MediaUploadSection = () => {
           </div>
         </Card>
 
-        {/* Media Gallery */}
+        {/* Gallery Controls */}
         {mediaFiles.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mediaFiles.map((file, index) => (
-              <Card 
-                key={file.id}
-                className="group overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500 opacity-0 animate-scale-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div 
-                  className="relative aspect-square overflow-hidden cursor-pointer"
-                  onClick={() => setSelectedMedia(file)}
+          <div className="flex flex-col lg:flex-row items-center justify-between mb-8 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-muted-foreground" />
+                <Button
+                  variant={filter === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleFilterChange('all')}
+                  className="text-sm"
                 >
-                  {file.file_type === 'image' ? (
-                    <img 
-                      src={getFileUrl(file.file_path)} 
-                      alt={file.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <Video className="w-16 h-16 text-muted-foreground" />
-                    </div>
-                  )}
+                  Tous ({mediaFiles.length})
+                </Button>
+                <Button
+                  variant={filter === 'image' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleFilterChange('image')}
+                  className="text-sm"
+                >
+                  Photos ({mediaFiles.filter(f => f.file_type === 'image').length})
+                </Button>
+                <Button
+                  variant={filter === 'video' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleFilterChange('video')}
+                  className="text-sm"
+                >
+                  Vidéos ({mediaFiles.filter(f => f.file_type === 'video').length})
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'masonry' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('masonry')}
+              >
+                <Grid className="w-4 h-4 mr-2" />
+                Mosaïque
+              </Button>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid className="w-4 h-4 mr-2" />
+                Grille
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Media Gallery */}
+        {totalFiles > 0 && (
+          <>
+            <div className={`${
+              viewMode === 'masonry' 
+                ? 'columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6' 
+                : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+            }`}>
+              {displayedFiles.map((file, index) => (
+                <Card 
+                  key={file.id}
+                  className={`group overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-xl transition-all duration-500 opacity-0 animate-scale-in ${
+                    viewMode === 'masonry' ? 'break-inside-avoid mb-6' : ''
+                  }`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div 
+                    className={`relative overflow-hidden cursor-pointer ${
+                      viewMode === 'masonry' ? 'aspect-auto' : 'aspect-square'
+                    }`}
+                    onClick={() => setSelectedMedia(file)}
+                  >
+                    {file.file_type === 'image' ? (
+                      <img 
+                        src={getFileUrl(file.file_path)} 
+                        alt={file.name}
+                        className={`w-full object-cover transition-transform duration-500 group-hover:scale-110 ${
+                          viewMode === 'masonry' ? 'h-auto' : 'h-full'
+                        }`}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className={`w-full bg-muted flex items-center justify-center ${
+                        viewMode === 'masonry' ? 'aspect-video' : 'h-full'
+                      }`}>
+                        <Video className="w-16 h-16 text-muted-foreground" />
+                      </div>
+                    )}
                   
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
@@ -344,10 +452,67 @@ const MediaUploadSection = () => {
                       <Video className="w-6 h-6 text-white" />
                     )}
                   </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center mt-12 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Précédent
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        className="w-10 h-10"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
                 </div>
-              </Card>
-            ))}
-          </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Suivant
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+
+            <div className="text-center mt-6 text-sm text-muted-foreground">
+              Affichage de {((currentPage - 1) * itemsPerPage) + 1} à {Math.min(currentPage * itemsPerPage, totalFiles)} sur {totalFiles} fichiers
+            </div>
+          </>
         )}
 
         {mediaFiles.length === 0 && (
