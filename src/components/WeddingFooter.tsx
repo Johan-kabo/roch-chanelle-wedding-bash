@@ -33,7 +33,7 @@ const WeddingFooter = () => {
           </div>
           <div className="flex items-center gap-3 group">
             <MapPin className="w-5 h-5 text-secondary group-hover:animate-float" />
-            <span className="font-inter font-medium">Cérémonie à 14h00</span>
+            <span className="font-inter font-medium">Cérémonie à 18h30</span>
           </div>
         </div>
 

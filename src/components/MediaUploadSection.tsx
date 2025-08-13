@@ -19,7 +19,7 @@ const MediaUploadSection = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
   const [filter, setFilter] = useState<'all' | 'image' | 'video'>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('masonry');
+  const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
