@@ -413,12 +413,20 @@ const MediaUploadSection = () => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className={`w-full bg-muted flex items-center justify-center ${
+                      <div className={`relative w-full ${
                         viewMode === 'masonry' 
                           ? 'aspect-video min-h-[120px] sm:min-h-[150px] md:min-h-[200px]' 
                           : 'h-full aspect-square'
                       }`}>
-                        <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-muted-foreground" />
+                        <video 
+                          className="w-full h-full object-cover"
+                          preload="metadata"
+                        >
+                          <source src={getFileUrl(file.file_path)} type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
+                        </div>
                       </div>
                     )}
                   
