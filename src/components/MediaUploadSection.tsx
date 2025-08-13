@@ -5,9 +5,80 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Upload, Image, Video, Download, Trash2, Camera, X, Grid, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Upload, Image, Video, Download, Trash2, Camera, X, Grid, ChevronLeft, ChevronRight, Filter, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase, type MediaFile } from "@/lib/supabase";
+
+// Composant pour générer les vignettes de vidéo
+const VideoThumbnail = ({ src, className }: { src: string; className: string }) => {
+  const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    if (!video || !canvas) return;
+
+    const handleLoadedData = () => {
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      video.currentTime = 0.5; // Capture à 0.5 seconde
+    };
+
+    const handleSeeked = () => {
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+      setThumbnailSrc(dataURL);
+    };
+
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('seeked', handleSeeked);
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('seeked', handleSeeked);
+    };
+  }, [src]);
+
+  return (
+    <div className={`relative ${className}`}>
+      <video
+        ref={videoRef}
+        src={src}
+        className="hidden"
+        muted
+        preload="metadata"
+      />
+      <canvas ref={canvasRef} className="hidden" />
+      
+      {thumbnailSrc ? (
+        <div className="relative w-full h-full">
+          <img 
+            src={thumbnailSrc} 
+            alt="Video thumbnail"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <Play className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
+          </div>
+        </div>
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-muted-foreground animate-pulse" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MediaUploadSection = () => {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -413,21 +484,14 @@ const MediaUploadSection = () => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className={`relative w-full ${
-                        viewMode === 'masonry' 
-                          ? 'aspect-video min-h-[120px] sm:min-h-[150px] md:min-h-[200px]' 
-                          : 'h-full aspect-square'
-                      }`}>
-                        <video 
-                          className="w-full h-full object-cover"
-                          preload="metadata"
-                        >
-                          <source src={getFileUrl(file.file_path)} type="video/mp4" />
-                        </video>
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
-                        </div>
-                      </div>
+                      <VideoThumbnail 
+                        src={getFileUrl(file.file_path)}
+                        className={`w-full ${
+                          viewMode === 'masonry' 
+                            ? 'aspect-video min-h-[120px] sm:min-h-[150px] md:min-h-[200px]' 
+                            : 'h-full aspect-square'
+                        }`}
+                      />
                     )}
                   
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
