@@ -9,70 +9,46 @@ import { Upload, Image, Video, Download, Trash2, Camera, X, Grid, ChevronLeft, C
 import { useToast } from "@/hooks/use-toast";
 import { supabase, type MediaFile } from "@/lib/supabase";
 
-// Composant pour générer les vignettes de vidéo
+// Composant pour les vignettes vidéo avec preview automatique
 const VideoThumbnail = ({ src, className }: { src: string; className: string }) => {
-  const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
+  const [isLoaded, setIsLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const video = videoRef.current;
-    const canvas = canvasRef.current;
-    
-    if (!video || !canvas) return;
+    if (!video) return;
 
     const handleLoadedData = () => {
-      const context = canvas.getContext('2d');
-      if (!context) return;
-
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
-      video.currentTime = 0.5; // Capture à 0.5 seconde
-    };
-
-    const handleSeeked = () => {
-      const context = canvas.getContext('2d');
-      if (!context) return;
-
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-      setThumbnailSrc(dataURL);
+      setIsLoaded(true);
+      // Déplace à la première seconde pour avoir une meilleure preview
+      video.currentTime = 1;
     };
 
     video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('seeked', handleSeeked);
-
-    return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('seeked', handleSeeked);
-    };
+    return () => video.removeEventListener('loadeddata', handleLoadedData);
   }, [src]);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className} overflow-hidden rounded-lg`}>
       <video
         ref={videoRef}
         src={src}
-        className="hidden"
+        className="w-full h-full object-cover"
         muted
         preload="metadata"
+        poster="" // Force pas de poster par défaut
       />
-      <canvas ref={canvasRef} className="hidden" />
       
-      {thumbnailSrc ? (
-        <div className="relative w-full h-full">
-          <img 
-            src={thumbnailSrc} 
-            alt="Video thumbnail"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <Play className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" />
-          </div>
+      {/* Overlay avec icône play */}
+      <div className="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity duration-300">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 sm:p-4">
+          <Play className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white fill-white" />
         </div>
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
+      </div>
+      
+      {/* Loading state */}
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
           <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-muted-foreground animate-pulse" />
         </div>
       )}
